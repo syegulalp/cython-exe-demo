@@ -10,10 +10,14 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import zipfile
+import py_compile
 
 embed_src = Path("embed")
 dist_path = Path("dist")
 exec_path = sys.base_prefix
+
+lib_dir = Path(subprocess.__file__).parent
 
 
 def clean_files():
@@ -54,7 +58,37 @@ shutil.move(str(Path("main.exe")), dist_path)
 
 clean_files()
 
-for f in ("python38.dll", "python38.zip"):
+libs = [
+    # The absolute basics
+    "codecs.py",
+    "io.py",
+    "abc.py",
+    "encodings/__init__.py",
+    "encodings/aliases.py",
+    "encodings/cp437.py",
+    "encodings/cp1252.py",
+    "encodings/latin_1.py",
+    "encodings/utf_8.py",
+    # Everything after this is needed for the site module
+    "site.py",
+    "os.py",
+    "stat.py",
+    "ntpath.py",
+    "genericpath.py",
+    "_collections_abc.py",
+    "_sitebuiltins.py",
+]
+
+z = zipfile.ZipFile(dist_path / "python38.zip", "w")
+for l in libs:
+    compiled = py_compile.compile(lib_dir / l)
+    z.write(
+        compiled,
+        l + "c",
+    )
+z.close()
+
+for f in ("python38.dll",):
     shutil.copy2(embed_src / f, dist_path)
 
 with open(dist_path / "python38._pth", "w") as f:
