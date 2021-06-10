@@ -3,4 +3,4 @@
 dist
 embed
 main.*
-!main.py
+!main.pyx
