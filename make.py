@@ -1,7 +1,9 @@
 # You may need to adjust this path on your system;
 # it assumes Visual Studio 2019's community build tools are installed
 
-vc_path = r"%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
+vc_path = (
+    r"%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build"
+)
 win_kitpath = r"%WindowsSdkDir%Lib\%WindowsSDKVersion%um\%VSCMD_ARG_HOST_ARCH%"
 
 from pathlib import Path
@@ -18,13 +20,14 @@ def clean_files():
     for f in ("main.exp", "main.lib", "main.obj", "main.c", "main.exe"):
         Path(f).unlink(missing_ok=True)
 
+
 build_win = ""
 
 if "-w" in sys.argv:
-    print ("Building Win32 application")
+    print("Building Win32 application")
     build_win = "/subsystem:windows /entry:wmainCRTStartup"
 else:
-    print ("Building console application")
+    print("Building console application")
 
 cmd = rf"""cython --embed -3 main.pyx
 call "{vc_path}\vcvarsall.bat" x64
@@ -58,4 +61,4 @@ with open(dist_path / "python38._pth", "w") as f:
     f.write("python38.zip")
 
 if "-r" in sys.argv:
-    subprocess.run(dist_path/"main.exe")
+    subprocess.run(dist_path / "main.exe")
