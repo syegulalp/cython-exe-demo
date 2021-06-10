@@ -8,7 +8,7 @@ This demo requires:
 * Visual Studio 2019 Community edition; specifically, the Visual C build tools
 * Cython
 
-> **Important:** In addition to having a Python version installed, you'll need to download the .ZIP-embeddable version of *the same version of Python used* and unpack it into a subdirectory named `embed`. This is so that the zipped copy of the standard library can be copied into the `dist` directory. For instance, the Python 3.8 version of the embeddable package can be downloaded from [https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip]()
+> **Important:** In addition to having a Python version installed, you'll need to download the .ZIP-embeddable version of *the same version of Python used* and unpack it into a subdirectory named `embed`. This is so that the zipped copy of the standard library can be copied into the `dist` directory. For instance, the Python 3.8 version of the embeddable package can be downloaded from [https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip](https://www.python.org/ftp/python/3.8.10/python-3.8.10-embed-amd64.zip)
 
 You can install the Python requirements from `requirements.txt`.
 
