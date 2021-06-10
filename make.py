@@ -56,7 +56,8 @@ print(out.decode("utf-8"))
 
 shutil.move(str(Path("main.exe")), dist_path)
 
-clean_files()
+if "-noclean" not in sys.argv:
+    clean_files()
 
 libs = [
     # The absolute basics
