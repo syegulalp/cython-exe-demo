@@ -6,11 +6,11 @@ This demo requires:
 
 * Python 3.8 or better (I haven't tested on anything less than that)
 * Visual Studio 2019 Community edition; specifically, the Visual C build tools
-* Cython
+* Cython (The 3.0 pre-release versions work fine; they're recommended anyway)
 
 You can install the Python requirements from `requirements.txt`.
 
-Run `make.py` to trigger the build process, which will build the file `.main.pyx`. The resulting executable, along with the Python .DLL and a minimal standard library, will be in a subdirectory named `dist`.
+Run `make.py` to trigger the build process, which will build the file `main.pyx`. The resulting executable, along with the Python .DLL and a minimal standard library, will be in a subdirectory named `dist`.
 
 `make.py` takes the following command-line flags:
 
