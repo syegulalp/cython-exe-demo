@@ -33,10 +33,26 @@ if "-w" in sys.argv:
 else:
     print("Building console application")
 
-cmd = rf"""cython --embed -3 main.pyx
-call "{vc_path}\vcvarsall.bat" x64
-cl main.c /I "{exec_path}\include" /link "{exec_path}\libs\{exec_id}.lib" "{win_kitpath}\User32.lib" "{win_kitpath}\Kernel32.lib" {build_win}
-"""
+_link_libs = [
+    fr'{exec_path}\libs\{exec_id}.lib',
+    fr'{win_kitpath}\User32.lib',
+    fr'{win_kitpath}\Kernel32.lib'
+]
+
+link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
+
+cmds = [
+    'cython --embed -3 main.pyx',
+    rf'call "{vc_path}\vcvarsall.bat" x64',
+    rf'cl main.c /I "{exec_path}\include" /link {link_libs}'
+]
+
+if '-v' in sys.argv or '-vv' in sys.argv:
+    print("Builder commands:\n")
+    for c in cmds:
+        print(c,"\n")
+
+cmd = '\n'.join(cmds)+'\n'
 
 clean_files()
 
@@ -52,7 +68,10 @@ console = subprocess.Popen(
     stderr=subprocess.PIPE,
 )
 out, err = console.communicate(bytes(cmd, encoding="utf8"))
-print(out.decode("utf-8"))
+
+if '-vv' in sys.argv:
+    print ("Command output:\n")
+    print(out.decode("utf-8"))
 
 shutil.move(str(Path("main.exe")), dist_path)
 
