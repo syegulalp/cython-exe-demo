@@ -16,6 +16,7 @@ Run `make.py` to trigger the build process, which will build the file `main.pyx`
 
 `make.py` takes the following command-line flags:
 
+* `-i:<filename>`: Select which file to compile. The default is `main.pyx`.
 * `-w`: Build a windowed-only version of the application (no console output).
 * `-r`: Run the built `.exe` immediately after completing the build process.
 * `-l:<libpath>`: Append the lib at `<libpath>` (in Python's standard library) to the standard library zipfile bundle. E.g., `-l:smtplib.py` will add `smtplib.py`. (Note that any dependencies are not automatically resolved.)

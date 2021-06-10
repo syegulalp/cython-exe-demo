@@ -6,12 +6,18 @@ vc_path = (
 )
 win_kitpath = r"%WindowsSdkDir%Lib\%WindowsSDKVersion%um\%VSCMD_ARG_HOST_ARCH%"
 
+import sys
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 import zipfile
 import py_compile
+
+input_file = "main.pyx"
+
+for m in sys.argv:
+    if m.startswith("-i:"):
+        input_file = m.split("-i:",1)[1]
 
 embed_src = Path("embed")
 dist_path = Path("dist")
@@ -19,19 +25,25 @@ exec_path = sys.base_prefix
 exec_id = f"python{sys.version_info[0]}{sys.version_info[1]}"
 lib_dir = Path(subprocess.__file__).parent
 
+print ("Building", input_file)
+
+if not Path(input_file).exists():
+    raise FileNotFoundError(f"File {input_file} not found")
+
+file_title = input_file.split('.',1)[0]
 
 def clean_files():
-    for f in ("main.exp", "main.lib", "main.obj", "main.c", "main.exe"):
+    for f in (f"{file_title}.exp", f"{file_title}.lib", f"{file_title}.obj", f"{file_title}.c", f"{file_title}.exe"):
         Path(f).unlink(missing_ok=True)
 
 
 build_win = ""
 
 if "-w" in sys.argv:
-    print("Building Win32 application")
+    print("Profile: Win32 application")
     build_win = "/subsystem:windows /entry:wmainCRTStartup"
 else:
-    print("Building console application")
+    print("Profile: console application")
 
 _link_libs = [
     fr'{exec_path}\libs\{exec_id}.lib',
@@ -42,9 +54,9 @@ _link_libs = [
 link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
 
 cmds = [
-    'cython --embed -3 main.pyx',
+    f'cython --embed -3 {file_title}.pyx',
     rf'call "{vc_path}\vcvarsall.bat" x64',
-    rf'cl main.c /I "{exec_path}\include" /link {link_libs}'
+    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs}'
 ]
 
 if '-v' in sys.argv or '-vv' in sys.argv:
@@ -73,7 +85,7 @@ if '-vv' in sys.argv:
     print ("Command output:\n")
     print(out.decode("utf-8"))
 
-shutil.move(str(Path("main.exe")), dist_path)
+shutil.move(str(Path(f"{file_title}.exe")), dist_path)
 
 if "-noclean" not in sys.argv:
     clean_files()
@@ -120,4 +132,7 @@ with open(dist_path / f"{exec_id}._pth", "w") as f:
     f.write(f"{exec_id}.zip")
 
 if "-r" in sys.argv:
-    subprocess.run(dist_path / "main.exe")
+    print ("Running",)
+    subprocess.run(dist_path / f"{file_title}.exe")
+
+print ("Finished building",input_file)
