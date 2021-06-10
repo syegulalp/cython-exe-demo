@@ -63,7 +63,7 @@ link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
 cmds = [
     f"cython --embed -3 {file_title}.pyx",
     rf'call "{vc_path}\vcvarsall.bat" x64',
-    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs}',
+    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs} {build_win}',
 ]
 
 if "-v" in sys.argv or "-vv" in sys.argv:
