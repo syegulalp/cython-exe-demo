@@ -5,3 +5,5 @@ cdef extern int MessageBoxA(long hwnd, char* text, char* caption, unsigned int t
 print ("Hello world msgbox active")
 
 MessageBoxA(0, "Greetings from Python".encode(), "Hello World!".encode(), 0)
+
+print ("Goodbye!")
