@@ -1,6 +1,5 @@
 .env
 .vscode
 dist
-embed
 main.*
 !main.pyx
