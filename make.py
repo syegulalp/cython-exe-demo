@@ -17,7 +17,7 @@ input_file = "main.pyx"
 
 for m in sys.argv:
     if m.startswith("-i:"):
-        input_file = m.split("-i:",1)[1]
+        input_file = m.split("-i:", 1)[1]
 
 embed_src = Path("embed")
 dist_path = Path("dist")
@@ -25,15 +25,22 @@ exec_path = sys.base_prefix
 exec_id = f"python{sys.version_info[0]}{sys.version_info[1]}"
 lib_dir = Path(subprocess.__file__).parent
 
-print ("Building", input_file)
+print("Building", input_file)
 
 if not Path(input_file).exists():
     raise FileNotFoundError(f"File {input_file} not found")
 
-file_title = input_file.split('.',1)[0]
+file_title = input_file.split(".", 1)[0]
+
 
 def clean_files():
-    for f in (f"{file_title}.exp", f"{file_title}.lib", f"{file_title}.obj", f"{file_title}.c", f"{file_title}.exe"):
+    for f in (
+        f"{file_title}.exp",
+        f"{file_title}.lib",
+        f"{file_title}.obj",
+        f"{file_title}.c",
+        f"{file_title}.exe",
+    ):
         Path(f).unlink(missing_ok=True)
 
 
@@ -46,25 +53,25 @@ else:
     print("Profile: console application")
 
 _link_libs = [
-    fr'{exec_path}\libs\{exec_id}.lib',
-    fr'{win_kitpath}\User32.lib',
-    fr'{win_kitpath}\Kernel32.lib'
+    fr"{exec_path}\libs\{exec_id}.lib",
+    fr"{win_kitpath}\User32.lib",
+    fr"{win_kitpath}\Kernel32.lib",
 ]
 
 link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
 
 cmds = [
-    f'cython --embed -3 {file_title}.pyx',
+    f"cython --embed -3 {file_title}.pyx",
     rf'call "{vc_path}\vcvarsall.bat" x64',
-    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs}'
+    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs}',
 ]
 
-if '-v' in sys.argv or '-vv' in sys.argv:
+if "-v" in sys.argv or "-vv" in sys.argv:
     print("Builder commands:\n")
     for c in cmds:
-        print(c,"\n")
+        print(c, "\n")
 
-cmd = '\n'.join(cmds)+'\n'
+cmd = "\n".join(cmds) + "\n"
 
 clean_files()
 
@@ -81,8 +88,8 @@ console = subprocess.Popen(
 )
 out, err = console.communicate(bytes(cmd, encoding="utf8"))
 
-if '-vv' in sys.argv:
-    print ("Command output:\n")
+if "-vv" in sys.argv:
+    print("Command output:\n")
     print(out.decode("utf-8"))
 
 shutil.move(str(Path(f"{file_title}.exe")), dist_path)
@@ -131,8 +138,8 @@ for f in (f"{exec_id}.dll",):
 with open(dist_path / f"{exec_id}._pth", "w") as f:
     f.write(f"{exec_id}.zip")
 
-print ("Finished building",input_file)
+print("Finished building", input_file)
 
 if "-r" in sys.argv:
-    print ("Running",file_title)
+    print("Running", file_title)
     subprocess.run(dist_path / f"{file_title}.exe")
