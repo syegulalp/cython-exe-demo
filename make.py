@@ -16,7 +16,7 @@ import py_compile
 embed_src = Path("embed")
 dist_path = Path("dist")
 exec_path = sys.base_prefix
-
+exec_id = f"python{sys.version_info[0]}{sys.version_info[1]}"
 lib_dir = Path(subprocess.__file__).parent
 
 
@@ -35,14 +35,14 @@ else:
 
 cmd = rf"""cython --embed -3 main.pyx
 call "{vc_path}\vcvarsall.bat" x64
-cl main.c /I "{exec_path}\include" /link "{exec_path}\libs\python38.lib" "{win_kitpath}\User32.lib" "{win_kitpath}\Kernel32.lib" {build_win}
+cl main.c /I "{exec_path}\include" /link "{exec_path}\libs\{exec_id}.lib" "{win_kitpath}\User32.lib" "{win_kitpath}\Kernel32.lib" {build_win}
 """
 
 clean_files()
 
 if dist_path.exists():
     shutil.rmtree(dist_path)
-    dist_path.mkdir()
+dist_path.mkdir()
 
 console = subprocess.Popen(
     "cmd.exe",
@@ -82,10 +82,10 @@ libs = [
 
 for m in sys.argv:
     if m.startswith("-l:"):
-        lib = m.split("-l:",1)[1]
+        lib = m.split("-l:", 1)[1]
         libs.append(lib)
 
-z = zipfile.ZipFile(dist_path / "python38.zip", "w")
+z = zipfile.ZipFile(dist_path / f"{exec_id}.zip", "w")
 for l in libs:
     compiled = py_compile.compile(lib_dir / l)
     z.write(
@@ -94,11 +94,11 @@ for l in libs:
     )
 z.close()
 
-for f in ("python38.dll",):
+for f in (f"{exec_id}.dll",):
     shutil.copy2(Path(exec_path, f), dist_path)
 
-with open(dist_path / "python38._pth", "w") as f:
-    f.write("python38.zip")
+with open(dist_path / f"{exec_id}._pth", "w") as f:
+    f.write(f"{exec_id}.zip")
 
 if "-r" in sys.argv:
     subprocess.run(dist_path / "main.exe")
