@@ -1,4 +1,6 @@
-This is a simple example of how to compile a Cython file to a standalone executable in Windows. There are very few good examples of how to do this with the most recent Visual Studio toolchain, so I thought I'd make this example for all who need it.
+This is a simple example of how to compile a Cython file to a standalone executable in Windows, using Cython's `--embed` feature.
+
+There are very few good examples of how to do this with the most recent Visual Studio toolchain, so I thought I'd make this example for all who need it.
 
 It ought to be possible to use this as a base for a way to create simple redistributable Python applications that have no more than they need to run.
 
