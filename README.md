@@ -16,6 +16,7 @@ Run `make.py` to trigger the build process. The resulting executable, along with
 
 * `-w`: Build a windowed-only version of the application (no console output).
 * `-r`: Run the built `.exe` immediately after completing the build process.
+* `-l:<libpath>`: Append the lib at `<libpath>` (in Python's standard library) to the standard library zipfile bundle. E.g., `-l:smtplib.py` will add `smtplib.py`. (Note that any dependencies are not automatically resolved.)
 
 In time I may expand this example with more switches and options to better control how the standard library and other bundled components (e.g., SQLite3) are handled.
 
