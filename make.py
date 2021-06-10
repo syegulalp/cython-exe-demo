@@ -79,6 +79,11 @@ libs = [
     "_sitebuiltins.py",
 ]
 
+for m in sys.argv:
+    if m.startswith("-l:"):
+        lib = m.split("-l:",1)[1]
+        libs.append(lib)
+
 z = zipfile.ZipFile(dist_path / "python38.zip", "w")
 for l in libs:
     compiled = py_compile.compile(lib_dir / l)
