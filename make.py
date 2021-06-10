@@ -94,7 +94,7 @@ for l in libs:
 z.close()
 
 for f in ("python38.dll",):
-    shutil.copy2(embed_src / f, dist_path)
+    shutil.copy2(Path(exec_path, f), dist_path)
 
 with open(dist_path / "python38._pth", "w") as f:
     f.write("python38.zip")
