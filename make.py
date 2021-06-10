@@ -131,8 +131,8 @@ for f in (f"{exec_id}.dll",):
 with open(dist_path / f"{exec_id}._pth", "w") as f:
     f.write(f"{exec_id}.zip")
 
-if "-r" in sys.argv:
-    print ("Running",)
-    subprocess.run(dist_path / f"{file_title}.exe")
-
 print ("Finished building",input_file)
+
+if "-r" in sys.argv:
+    print ("Running",file_title)
+    subprocess.run(dist_path / f"{file_title}.exe")
