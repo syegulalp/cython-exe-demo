@@ -5,7 +5,7 @@ It ought to be possible to use this as a base for a way to create simple redistr
 This demo requires:
 
 * Python 3.8 or better (I haven't tested on anything less than that)
-* Visual Studio 2019 Community edition; specifically, the Visual C build tools
+* [Visual Studio Build Tools 2019](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16), or [Visual Studio 2019 Community Edition](https://visualstudio.microsoft.com/downloads/) (which includes the build tools)
 * Cython (The 3.0 pre-release versions work fine; they're recommended anyway)
 
 You can install the Python requirements from `requirements.txt`.
