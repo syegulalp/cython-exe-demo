@@ -1,3 +1,5 @@
+# TODO: link against MSVCRT (?) need vcruntime140.dll
+
 # You may need to adjust this path on your system;
 # it assumes Visual Studio 2019's community build tools are installed
 
@@ -12,6 +14,16 @@ import shutil
 import subprocess
 import zipfile
 import py_compile
+
+link_vcrt = True
+bundle_vcrt = True
+
+if "-nobundle" in sys.argv:
+    bundle_vcrt = False
+
+if "-novlink" in sys.argv:
+    link_vcrt = False
+    bundle_vcrt = False
 
 input_file = "main.pyx"
 
@@ -63,8 +75,9 @@ link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
 cmds = [
     f"cython --embed -3 {file_title}.pyx",
     rf'call "{vc_path}\vcvarsall.bat" x64',
-    rf'cl {file_title}.c /I "{exec_path}\include" /link {link_libs} {build_win}',
+    rf'cl {file_title}.c {"/MD" if link_vcrt else ""} /I "{exec_path}\include" /link {link_libs} {build_win}',
 ]
+# /MD
 
 if "-v" in sys.argv or "-vv" in sys.argv:
     print("Builder commands:\n")
@@ -132,7 +145,11 @@ for l in libs:
     )
 z.close()
 
-for f in (f"{exec_id}.dll",):
+redist = [f"{exec_id}.dll"]
+if bundle_vcrt:
+    redist.append("vcruntime140.dll")
+
+for f in redist:
     shutil.copy2(Path(exec_path, f), dist_path)
 
 with open(dist_path / f"{exec_id}._pth", "w") as f:
