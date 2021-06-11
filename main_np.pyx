@@ -8,10 +8,11 @@
 
 cdef extern int MessageBoxA(long hwnd, char* text, char* caption, unsigned int type )
 
-import numpy
-
-print ("Hello world msgbox active", numpy)
-
-MessageBoxA(0, f"Greetings from Python: {numpy}".encode(), "Hello World!".encode(), 0)
-
-print ("Goodbye!")
+try:
+    import numpy
+except:
+    MessageBoxA(0, f"Numpy not found, can't continue.".encode(), "O NOZ".encode(), 0)
+else:
+    print ("Hello world msgbox active", numpy)
+    MessageBoxA(0, f"Greetings from Python: {numpy}".encode(), "Hello World!".encode(), 0)
+    print ("Goodbye!")
