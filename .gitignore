@@ -1,5 +1,7 @@
 .env
 .vscode
 dist
+embed
+*.zip
 main.*
 !main.pyx
