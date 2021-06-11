@@ -15,6 +15,18 @@ import subprocess
 import zipfile
 import py_compile
 
+
+def clean_files(file_title):
+    for f in (
+        f"{file_title}.exp",
+        f"{file_title}.lib",
+        f"{file_title}.obj",
+        f"{file_title}.c",
+        f"{file_title}.exe",
+    ):
+        Path(f).unlink(missing_ok=True)
+
+
 link_vcrt = True
 bundle_vcrt = True
 
@@ -29,7 +41,12 @@ input_file = "main.pyx"
 
 for m in sys.argv:
     if m.startswith("-i:"):
-        input_file = m.split("-i:", 1)[1]
+        input_file = Path(m.split("-i:", 1)[1])
+
+if not input_file.exists():
+    raise FileNotFoundError(f"File {input_file} not found")
+
+file_title = input_file.stem
 
 embed_src = Path("embed")
 dist_path = Path("dist")
@@ -38,23 +55,6 @@ exec_id = f"python{sys.version_info[0]}{sys.version_info[1]}"
 lib_dir = Path(subprocess.__file__).parent
 
 print("Building", input_file)
-
-if not Path(input_file).exists():
-    raise FileNotFoundError(f"File {input_file} not found")
-
-file_title = input_file.split(".", 1)[0]
-
-
-def clean_files():
-    for f in (
-        f"{file_title}.exp",
-        f"{file_title}.lib",
-        f"{file_title}.obj",
-        f"{file_title}.c",
-        f"{file_title}.exe",
-    ):
-        Path(f).unlink(missing_ok=True)
-
 
 build_win = ""
 
@@ -86,7 +86,7 @@ if "-v" in sys.argv or "-vv" in sys.argv:
 
 cmd = "\n".join(cmds) + "\n"
 
-clean_files()
+clean_files(file_title)
 
 if dist_path.exists():
     shutil.rmtree(dist_path)
@@ -108,7 +108,7 @@ if "-vv" in sys.argv:
 shutil.move(str(Path(f"{file_title}.exe")), dist_path)
 
 if "-noclean" not in sys.argv:
-    clean_files()
+    clean_files(file_title)
 
 libs = [
     # The absolute basics
