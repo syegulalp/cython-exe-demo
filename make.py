@@ -37,7 +37,7 @@ if "-novlink" in sys.argv:
     link_vcrt = False
     bundle_vcrt = False
 
-input_file = "main.pyx"
+input_file = Path("main.pyx")
 
 for m in sys.argv:
     if m.startswith("-i:"):
