@@ -28,4 +28,6 @@ Run `make.py` to trigger the build process, which will build the file `main.pyx`
 
 In time I may expand this example with more switches and options to better control how the standard library and other bundled components (e.g., SQLite3) are handled.
 
+You can also use `compile.bat` to see a minimal example of how this works.
+
 This code is distributed under the MIT license.
