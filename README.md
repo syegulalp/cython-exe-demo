@@ -20,6 +20,9 @@ Run `make.py` to trigger the build process, which will build the file `main.pyx`
 * `-w`: Build a windowed-only version of the application (no console output).
 * `-r`: Run the built `.exe` immediately after completing the build process.
 * `-l:<libpath>`: Append the lib at `<libpath>` (in Python's standard library) to the standard library zipfile bundle. E.g., `-l:smtplib.py` will add `smtplib.py`. (Note that any dependencies are not automatically resolved.)
+* `-c:<directory>`: Copy the contents of `<directory>` into the distribution folder. You can use this command multiple times to copy multiple directories.
+* `-cc:<directory>`: Copy the contents of `<directory>` into the distribution folder. If this folder contains `.py` files they will be compiled as `.pyc` and replaced.
+* `-cz:<directory>`: Copy the contents of `<directory>` into the distribution folder, but compress them into a zip file named `app`. If this folder contains `.py` files they will be compiled as `.pyc` and replaced.
 * `-v`: Verbose mode. Display the commands sent to the build process.
 * `-vv`: Extra verbose mode. Echo results of build commands to the console.
 * `-noclean`: By default the script cleans build artifacts (e.g., the generated C file) from the directory. Use this option to leave the build artifacts in place after the script runs. (Note that any *existing* artifacts will be overwritten with each build.)

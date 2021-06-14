@@ -14,6 +14,7 @@ import shutil
 import subprocess
 import zipfile
 import py_compile
+import os
 
 
 def clean_files(file_title):
@@ -153,10 +154,41 @@ for f in redist:
     shutil.copy2(Path(exec_path, f), dist_path)
 
 with open(dist_path / f"{exec_id}._pth", "w") as f:
-    f.write(f"{exec_id}.zip")
+    f.write(f".\napp.zip\n{exec_id}.zip")
+
+for m in sys.argv:
+    if m.startswith("-c:"):
+        dir = m.split("-c:", 1)[1]
+        shutil.copytree(dir, dist_path / dir)
+    elif m.startswith("-cc:"):
+        dir = m.split("-cc:", 1)[1]
+        shutil.copytree(dir, dist_path / dir)
+        for root, dirs, files in os.walk(dist_path):
+            for f in files:
+                if f.endswith(".py"):
+                    compiled = py_compile.compile(Path(root, f), Path(root, f + "c"))
+                    Path(root, f).unlink()
+
+    elif m.startswith("-cz:"):
+        dir = m.split("-cz:", 1)[1]
+        z = zipfile.ZipFile(dist_path / "app.zip", "w")
+        xroot = Path(dir).stem
+        for root, dirs, files in os.walk(dir):
+            for f in files:
+                if f.endswith(".pyc"):
+                    continue
+                if f.endswith(".py"):
+                    compiled = py_compile.compile(Path(root, f))
+                    z.write(compiled, Path(xroot, f + "c"))
+                else:
+                    z.write(Path(root, f))
+        z.close()
+        # TODO: copy out binary files into another hierarchy outside zip
+
 
 print("Finished building", input_file)
 
 if "-r" in sys.argv:
     print("Running", file_title)
-    subprocess.run(dist_path / f"{file_title}.exe")
+    os.chdir(dist_path)
+    subprocess.run(f"{file_title}.exe")
