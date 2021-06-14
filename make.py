@@ -1,5 +1,3 @@
-# TODO: link against MSVCRT (?) need vcruntime140.dll
-
 # You may need to adjust this path on your system;
 # it assumes Visual Studio 2019's community build tools are installed
 
@@ -20,18 +18,19 @@ import platform
 
 arch = platform.machine().lower()
 py_ver = platform.python_version()
-embed = f'python-{py_ver}-embed-{arch}.zip'
+embed = f"python-{py_ver}-embed-{arch}.zip"
 
 site_packages = site.getsitepackages()
 
 use_embed = False
 
 if "-embed" in sys.argv:
-    print ("Using embeddable Python distribution")
+    print("Using embeddable Python distribution")
     if not Path(embed).exists():
         embed_url = f"https://www.python.org/ftp/python/{py_ver}/{embed}"
-        print (f"{embed} not found, attempting to download from {embed_url}")
+        print(f"{embed} not found, attempting to download from {embed_url}")
         import urllib.request
+
         with urllib.request.urlopen(embed_url) as n:
             data = n.read()
         with open(embed, "wb") as f:
