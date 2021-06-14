@@ -15,6 +15,9 @@ import subprocess
 import zipfile
 import py_compile
 import os
+import site
+
+site_packages = site.getsitepackages()
 
 
 def clean_files(file_title):
@@ -74,7 +77,7 @@ _link_libs = [
 link_libs = " ".join([f'"{lib}"' for lib in _link_libs])
 
 cmds = [
-    f"cython --embed -3 {file_title}.pyx",
+    f"py -m cython --embed -3 {file_title}.pyx",
     rf'call "{vc_path}\vcvarsall.bat" x64',
     rf'cl {file_title}.c {"/MD" if link_vcrt else ""} /I "{exec_path}\include" /link {link_libs} {build_win}',
 ]
@@ -157,15 +160,28 @@ with open(dist_path / f"{exec_id}._pth", "w") as f:
     f.write(f".\napp.zip\n{exec_id}.zip")
 
 for m in sys.argv:
-    if m.startswith("-c:"):
+    if m.startswith("-lc:"):
+        dir = m.split("-lc:", 1)[1]
+        for s in site_packages:
+            print(Path(s, dir))
+            print(Path(s, dir).exists())
+            if Path(s, dir).exists():
+                print("ok")
+                shutil.copytree(Path(s, dir), Path(dist_path, dir))
+    elif m.startswith("-c:"):
         dir = m.split("-c:", 1)[1]
         shutil.copytree(dir, dist_path / dir)
     elif m.startswith("-cc:"):
         dir = m.split("-cc:", 1)[1]
         shutil.copytree(dir, dist_path / dir)
         for root, dirs, files in os.walk(dist_path):
+            for d in dirs:
+                if d.endswith("__pycache__"):
+                    shutil.rmtree(Path(root, d))
             for f in files:
-                if f.endswith(".py"):
+                if f.endswith(".pyc"):
+                    continue
+                elif f.endswith(".py"):
                     compiled = py_compile.compile(Path(root, f), Path(root, f + "c"))
                     Path(root, f).unlink()
 

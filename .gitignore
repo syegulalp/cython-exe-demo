@@ -5,3 +5,4 @@ embed
 *.zip
 main.*
 !main.pyx
+**/*.pyc
