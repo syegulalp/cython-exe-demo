@@ -16,8 +16,28 @@ import zipfile
 import py_compile
 import os
 import site
+import platform
+
+arch = platform.machine().lower()
+py_ver = platform.python_version()
+embed = f'python-{py_ver}-embed-{arch}.zip'
 
 site_packages = site.getsitepackages()
+
+use_embed = False
+
+if "-embed" in sys.argv:
+    print ("Using embeddable Python distribution")
+    if not Path(embed).exists():
+        embed_url = f"https://www.python.org/ftp/python/{py_ver}/{embed}"
+        print (f"{embed} not found, attempting to download from {embed_url}")
+        import urllib.request
+        with urllib.request.urlopen(embed_url) as n:
+            data = n.read()
+        with open(embed, "wb") as f:
+            f.write(data)
+
+    use_embed = True
 
 
 def clean_files(file_title):
@@ -52,7 +72,6 @@ if not input_file.exists():
 
 file_title = input_file.stem
 
-embed_src = Path("embed")
 dist_path = Path("dist")
 exec_path = sys.base_prefix
 exec_id = f"python{sys.version_info[0]}{sys.version_info[1]}"
@@ -114,59 +133,62 @@ shutil.move(str(Path(f"{file_title}.exe")), dist_path)
 if "-noclean" not in sys.argv:
     clean_files(file_title)
 
-libs = [
-    # The absolute basics
-    "codecs.py",
-    "io.py",
-    "abc.py",
-    "encodings/__init__.py",
-    "encodings/aliases.py",
-    "encodings/cp437.py",
-    "encodings/cp1252.py",
-    "encodings/latin_1.py",
-    "encodings/utf_8.py",
-    # Everything after this is needed for the site module
-    "site.py",
-    "os.py",
-    "stat.py",
-    "ntpath.py",
-    "genericpath.py",
-    "_collections_abc.py",
-    "_sitebuiltins.py",
-]
+if use_embed:
+    z = zipfile.ZipFile(embed)
+    z.extractall(dist_path)
 
-for m in sys.argv:
-    if m.startswith("-l:"):
-        lib = m.split("-l:", 1)[1]
-        libs.append(lib)
+else:
 
-z = zipfile.ZipFile(dist_path / f"{exec_id}.zip", "w")
-for l in libs:
-    compiled = py_compile.compile(lib_dir / l)
-    z.write(
-        compiled,
-        l + "c",
-    )
-z.close()
+    libs = [
+        # The absolute basics
+        "codecs.py",
+        "io.py",
+        "abc.py",
+        "encodings/__init__.py",
+        "encodings/aliases.py",
+        "encodings/cp437.py",
+        "encodings/cp1252.py",
+        "encodings/latin_1.py",
+        "encodings/utf_8.py",
+        # Everything after this is needed for the site module
+        "site.py",
+        "os.py",
+        "stat.py",
+        "ntpath.py",
+        "genericpath.py",
+        "_collections_abc.py",
+        "_sitebuiltins.py",
+    ]
 
-redist = [f"{exec_id}.dll"]
-if bundle_vcrt:
-    redist.append("vcruntime140.dll")
+    for m in sys.argv:
+        if m.startswith("-l:"):
+            lib = m.split("-l:", 1)[1]
+            libs.append(lib)
 
-for f in redist:
-    shutil.copy2(Path(exec_path, f), dist_path)
+    z = zipfile.ZipFile(dist_path / f"{exec_id}.zip", "w")
+    for l in libs:
+        compiled = py_compile.compile(lib_dir / l)
+        z.write(
+            compiled,
+            l + "c",
+        )
+    z.close()
 
-with open(dist_path / f"{exec_id}._pth", "w") as f:
-    f.write(f".\napp.zip\n{exec_id}.zip")
+    redist = [f"{exec_id}.dll"]
+    if bundle_vcrt:
+        redist.append("vcruntime140.dll")
+
+    for f in redist:
+        shutil.copy2(Path(exec_path, f), dist_path)
+
+    with open(dist_path / f"{exec_id}._pth", "w") as f:
+        f.write(f".\napp.zip\n{exec_id}.zip")
 
 for m in sys.argv:
     if m.startswith("-lc:"):
         dir = m.split("-lc:", 1)[1]
         for s in site_packages:
-            print(Path(s, dir))
-            print(Path(s, dir).exists())
             if Path(s, dir).exists():
-                print("ok")
                 shutil.copytree(Path(s, dir), Path(dist_path, dir))
     elif m.startswith("-c:"):
         dir = m.split("-c:", 1)[1]
